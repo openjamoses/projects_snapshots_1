@@ -1,0 +1,32 @@
+version: "{build}"
+image: Visual Studio 2017
+platform: x64
+configuration: Debug
+
+install:
+  - git submodule update --init
+
+environment:
+  CLICOLOR_FORCE: 1
+  matrix:
+    - MSYSTEM: MINGW64
+    - MSYSTEM: MSVC
+
+matrix:
+  fast_finish: true # Immediately finish build if one of the jobs fails.
+
+before_build: 
+  - cmake -DCMAKE_INSTALL_PREFIX=install -DCMAKE_GENERATOR_PLATFORM=x64 .
+
+build:
+  project: cquery.sln
+
+after_build:
+  - cmake --build . --target install
+
+test_script:
+  - .\install\bin\cquery.exe --ci --log-all-to-stderr --test-unit
+  - .\install\bin\cquery.exe --ci --log-all-to-stderr --test-index
+
+cache:
+  - C:\projects\cquery\build\LLVM-6.0.0-win64\

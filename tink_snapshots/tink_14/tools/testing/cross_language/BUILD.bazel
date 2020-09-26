@@ -1,0 +1,77 @@
+load("@rules_python//python:defs.bzl", "py_test")
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//:__subpackages__"])
+
+licenses(["notice"])
+
+filegroup(
+    name = "test_lib",
+    srcs = [
+        "test_util.sh",
+    ],
+)
+
+sh_test(
+    name = "version_test",
+    size = "medium",
+    srcs = [
+        "version_test.sh",
+    ],
+    data = [
+        ":test_lib",
+        "//testing:version_cli_java",
+        "//testing/cc:version_cli_cc",
+        "@tink_base//:tink_version",
+    ],
+)
+
+sh_test(
+    name = "aead_envelope_test",
+    size = "medium",
+    srcs = [
+        "aead_envelope_test.sh",
+    ],
+    data = [
+        ":test_lib",
+        "//testing:aead_cli_java",
+        "//testing/cc:aead_cli_cc",
+        "//testing/go:aead_cli_go",
+        "//testing/go:generate_envelope_keyset",
+        "//testing/python:aead_cli_python",
+        "//tinkey",
+        "@google_root_pem//file",
+        "@tink_base//testdata:credentials",
+    ],
+    tags = ["no_rbe"],
+)
+
+sh_test(
+    name = "streaming_aead_test",
+    size = "medium",
+    srcs = [
+        "streaming_aead_test.sh",
+    ],
+    data = [
+        ":test_lib",
+        "//testing:streaming_aead_cli_java",
+        "//testing/cc:streaming_aead_cli_cc",
+        "//testing/go:streaming_aead_cli_go",
+        "//tinkey",
+    ],
+)
+
+sh_test(
+    name = "prf_set_test",
+    size = "medium",
+    srcs = [
+        "prf_set_test.sh",
+    ],
+    data = [
+        ":test_lib",
+        "//testing:prf_set_cli_java",
+        "//testing/cc:prf_set_cli_cc",
+        "//testing/go:prf_set_cli_go",
+        "//tinkey",
+    ],
+)

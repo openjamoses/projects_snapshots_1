@@ -1,0 +1,132 @@
+package(default_visibility = ["//tools/testing:__subpackages__"])
+
+licenses(["notice"])  # Apache 2.0
+
+cc_library(
+    name = "cli_util",
+    srcs = ["cli_util.cc"],
+    hdrs = ["cli_util.h"],
+    deps = [
+        "//cc",
+        "//cc:binary_keyset_reader",
+        "//cc:cleartext_keyset_handle",
+        "//cc:config",
+        "//cc:json_keyset_reader",
+        "//cc:json_keyset_writer",
+        "//cc/config:tink_config",
+        "//cc/util:status",
+    ],
+)
+
+filegroup(
+    name = "aws_kms_access_files",
+    srcs = glob(["*access_key.csv"]) + [
+        "aws_key_arn.txt",
+        "bad_aws_key_arn.txt",
+    ],
+)
+
+cc_binary(
+    name = "aws_kms_aead_cli",
+    srcs = ["aws_kms_aead_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+        "//cc/integration/awskms:aws_crypto",
+        "//cc/integration/awskms:aws_kms_aead",
+        "@aws_cpp_sdk//:aws_sdk_core",
+    ],
+)
+
+cc_binary(
+    name = "keyset_reader_writer_cli",
+    srcs = ["keyset_reader_writer_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "version_cli_cc",
+    srcs = ["version_cli.cc"],
+    deps = [
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "aead_cli_cc",
+    srcs = ["aead_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "deterministic_aead_cli_cc",
+    srcs = ["deterministic_aead_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "mac_cli_cc",
+    srcs = ["mac_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "hybrid_encrypt_cli_cc",
+    srcs = ["hybrid_encrypt_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "hybrid_decrypt_cli_cc",
+    srcs = ["hybrid_decrypt_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "public_key_sign_cli_cc",
+    srcs = ["public_key_sign_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+cc_binary(
+    name = "public_key_verify_cli_cc",
+    srcs = ["public_key_verify_cli.cc"],
+    deps = [
+        ":cli_util",
+        "//cc",
+    ],
+)
+
+sh_test(
+    name = "aws_kms_aead_test",
+    size = "medium",
+    srcs = [
+        "aws_kms_aead_test.sh",
+    ],
+    data = [
+        ":aws_kms_access_files",
+        ":aws_kms_aead_cli",
+        "//tools/testing/cross_language:test_lib",
+    ],
+)

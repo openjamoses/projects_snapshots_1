@@ -1,0 +1,77 @@
+CXXFLAGS=@CXXFLAGS@
+LDFLAGS=@LDFLAGS@
+
+# TODO: change this when doing make install? Move to configure script?
+# Directory in which packages are found
+PKGS_DIR=\"$(CURDIR)/packages/\"
+
+# Add a preprocessor definition for the packages directory
+CXXFLAGS:=${CXXFLAGS} -DPKGS_DIR="${PKGS_DIR}"
+
+all: zeta cplush plush-pkg plush-bench math-pkg cscheme
+
+test: all
+	./run_tests.sh
+
+clean:
+	rm -rf *.o *.dSYM $(ZETA_BIN) $(CPLUSH_BIN) $(CSCHEME_BIN) config.status config.log
+
+# Tells make which targets are not files
+.PHONY: all test clean plush-pkg
+
+##############################################################################
+# ZetaVM
+##############################################################################
+
+ZETA_BIN=zeta
+
+ZETA_SRCS=  	\
+vm/runtime.cpp 	\
+vm/parser.cpp   \
+vm/interp.cpp   \
+vm/packages.cpp \
+vm/main.cpp     \
+
+zeta: vm/*.cpp vm/*.h
+	$(CXX) $(CXXFLAGS) -o $(ZETA_BIN) $(ZETA_SRCS) $(LDFLAGS)
+
+##############################################################################
+# Plush compiler
+##############################################################################
+
+CPLUSH_BIN=cplush
+
+CPLUSH_SRCS= 		\
+plush/parser.cpp  	\
+plush/codegen.cpp 	\
+plush/main.cpp    	\
+
+cplush: plush/*.cpp plush/*.h
+	$(CXX) $(CXXFLAGS) -o $(CPLUSH_BIN) $(CPLUSH_SRCS)
+
+plush-pkg: plush/parser.pls
+	mkdir -p packages/lang/plush/0
+	./$(CPLUSH_BIN) plush/parser.pls > packages/lang/plush/0/package
+	./$(CPLUSH_BIN) tests/plush/parser.pls > packages/lang/plush/0/tests
+
+# Plush parser benchmark
+plush-bench:
+	./$(CPLUSH_BIN)  benchmarks/plush_parser.pls > benchmarks/plush_parser.zim
+
+math-pkg: plush/parser.pls
+	mkdir -p packages/std/math/0
+	./$(CPLUSH_BIN) plush/math.pls > packages/std/math/0/package
+
+##############################################################################
+# Scheme compiler
+##############################################################################
+
+CSCHEME_BIN=cscheme
+
+CSCHEME_SRCS=       \
+scheme/parser.cpp   \
+scheme/codegen.cpp  \
+scheme/main.cpp     \
+
+cscheme: scheme/*.cpp scheme/*.h
+	$(CXX) $(CXXFLAGS) -o $(CSCHEME_BIN) $(CSCHEME_SRCS)

@@ -1,0 +1,286 @@
+licenses(["notice"])  # Apache 2.0
+
+package(default_visibility = ["//tools/build_defs:internal_pkg"])
+
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_unit_test")
+
+# public libraries
+
+PUBLIC_APIS = [
+    "TINKAead.h",
+    "TINKAeadConfig.h",
+    "TINKAeadFactory.h",
+    "TINKAeadKeyTemplates.h",
+    "TINKAllConfig.h",
+    "TINKBinaryKeysetReader.h",
+    "TINKConfig.h",
+    "TINKHybridConfig.h",
+    "TINKHybridDecrypt.h",
+    "TINKHybridDecryptFactory.h",
+    "TINKHybridEncrypt.h",
+    "TINKHybridEncryptFactory.h",
+    "TINKKeyManager.h",
+    "TINKKeysetHandle.h",
+    "TINKKeysetReader.h",
+    "TINKMac.h",
+    "TINKMacConfig.h",
+    "TINKMacFactory.h",
+    "TINKRegistryConfig.h",
+    "TINKVersion.h",
+]
+
+PUBLIC_API_DEPS = [
+    ":aead",
+    ":all_config",
+    ":binary_keyset_reader",
+    ":config",
+    ":hybrid_decrypt",
+    ":hybrid_encrypt",
+    ":key_manager",
+    ":keyset_handle",
+    ":keyset_reader",
+    ":mac",
+    ":registry_config",
+    ":version",
+    "//objc/aead:aead_config",
+    "//objc/aead:aead_factory",
+    "//objc/aead:aead_key_templates",
+    "//objc/hybrid:hybrid_config",
+    "//objc/hybrid:hybrid_decrypt_factory",
+    "//objc/hybrid:hybrid_encrypt_factory",
+    "//objc/mac:mac_config",
+    "//objc/mac:mac_factory",
+    "//objc/util:errors",
+    "//objc/util:strings",
+    "//proto:all_objc_proto",
+]
+
+objc_library(
+    name = "objc",
+    hdrs = PUBLIC_APIS,
+    visibility = ["//visibility:public"],
+    deps = PUBLIC_API_DEPS,
+)
+
+objc_library(
+    name = "testonly",
+    testonly = 1,
+    hdrs = PUBLIC_APIS + [
+        "TINKKeysetHandle+Cleartext.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = PUBLIC_API_DEPS + [
+        ":cleartext_keyset_handle",
+    ],
+)
+
+# private libraries
+
+objc_library(
+    name = "aead",
+    hdrs = ["TINKAead.h"],
+)
+
+objc_library(
+    name = "all_config",
+    srcs = ["core/TINKAllConfig.mm"],
+    hdrs = [
+        "TINKAllConfig.h",
+    ],
+    deps = [
+        ":config_pb",
+        ":registry_config",
+        ":version",
+        "//cc/config:tink_config",
+        "//cc/util:errors",
+        "//objc/util:errors",
+    ],
+)
+
+objc_library(
+    name = "binary_keyset_reader",
+    srcs = ["core/TINKBinaryKeysetReader.mm"],
+    hdrs = [
+        "TINKBinaryKeysetReader.h",
+    ],
+    deps = [
+        ":keyset_reader",
+        ":tink_pb",
+        "//cc:binary_keyset_reader",
+        "//objc/util:errors",
+        "//objc/util:strings",
+        "//proto:all_objc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+objc_library(
+    name = "cleartext_keyset_handle",
+    srcs = ["core/TINKKeysetHandle+Cleartext.mm"],
+    hdrs = [
+        "TINKKeysetHandle+Cleartext.h",
+    ],
+    deps = [
+        ":keyset_handle",
+        ":keyset_reader",
+        "//cc:cleartext_keyset_handle",
+        "//objc/util:errors",
+    ],
+)
+
+objc_library(
+    name = "config",
+    srcs = ["core/TINKConfig.mm"],
+    hdrs = [
+        "TINKConfig.h",
+    ],
+    deps = [
+        ":registry_config",
+        "//cc:config",
+        "//objc/util:errors",
+    ],
+)
+
+objc_library(
+    name = "hybrid_decrypt",
+    hdrs = [
+        "TINKHybridDecrypt.h",
+    ],
+)
+
+objc_library(
+    name = "hybrid_encrypt",
+    hdrs = [
+        "TINKHybridEncrypt.h",
+    ],
+)
+
+objc_library(
+    name = "key_manager",
+    hdrs = [
+        "TINKKeyManager.h",
+    ],
+)
+
+objc_library(
+    name = "keyset_handle",
+    srcs = ["core/TINKKeysetHandle.mm"],
+    hdrs = [
+        "TINKKeysetHandle.h",
+        "core/TINKKeysetHandle_Internal.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":aead",
+        ":keyset_reader",
+        ":tink_pb",
+        "//cc:keyset_handle",
+        "//cc/util:status",
+        "//objc/aead:aead_internal",
+        "//objc/util:errors",
+        "//objc/util:strings",
+        "//proto:all_objc_proto",
+    ],
+)
+
+objc_library(
+    name = "keyset_reader",
+    srcs = ["core/TINKKeysetReader.mm"],
+    hdrs = [
+        "TINKKeysetReader.h",
+        "core/TINKKeysetReader_Internal.h",
+    ],
+    deps = [
+        "//cc:keyset_reader",
+    ],
+)
+
+objc_library(
+    name = "mac",
+    hdrs = [
+        "TINKMac.h",
+    ],
+)
+
+objc_library(
+    name = "registry_config",
+    srcs = ["core/TINKRegistryConfig.mm"],
+    hdrs = [
+        "TINKRegistryConfig.h",
+        "core/TINKRegistryConfig_Internal.h",
+    ],
+    deps = [
+        ":config_pb",
+        ":version",
+    ],
+)
+
+objc_library(
+    name = "version",
+    hdrs = [
+        "TINKVersion.h",
+    ],
+)
+
+# C++ protocol buffers.
+# We need to convert them to cc_library so we can add them as a dependency of objc_library targets.
+
+cc_library(
+    name = "aes_gcm_pb",
+    deps = [
+        "//proto:aes_gcm_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "config_pb",
+    deps = [
+        "//proto:config_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "tink_pb",
+    deps = [
+        "//proto:tink_cc_proto",
+    ],
+)
+
+############################
+#         Tests            #
+############################
+
+ios_unit_test(
+    name = "TinkTests",
+    minimum_os_version = "9.0",
+    deps = [
+        ":UnitTestLib",
+    ],
+)
+
+objc_library(
+    name = "UnitTestLib",
+    testonly = 1,
+    srcs = glob([
+        "Tests/UnitTests/**/*.m",
+        "Tests/UnitTests/**/*.mm",
+    ]),
+    hdrs = glob([
+        "Tests/UnitTests/**/*.h",
+    ]),
+    deps = [
+        ":testonly",
+        "//cc:aead",
+        "//cc:crypto_format",
+        "//cc:keyset_handle",
+        "//cc/aead:aead_config",
+        "//cc/aead:aead_factory",
+        "//cc/aead:aes_gcm_key_manager",
+        "//cc/util:status",
+        "//cc/util:test_util",
+        "//objc/aead:aead_internal",
+        "//objc/hybrid:ecies_aead_hkdf_public_key_manager",
+        "//objc/util:test_helpers",
+        "//proto:all_objc_proto",
+    ],
+)

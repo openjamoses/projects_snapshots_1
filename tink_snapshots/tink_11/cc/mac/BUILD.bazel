@@ -1,0 +1,244 @@
+package(default_visibility = ["//tools/build_defs:internal_pkg"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "mac_wrapper",
+    srcs = ["mac_wrapper.cc"],
+    hdrs = ["mac_wrapper.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:crypto_format",
+        "//cc:mac",
+        "//cc:primitive_set",
+        "//cc:primitive_wrapper",
+        "//cc/subtle:subtle_util_boringssl",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "mac_config",
+    srcs = ["mac_config.cc"],
+    hdrs = ["mac_config.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":aes_cmac_key_manager",
+        ":hmac_key_manager",
+        ":mac_wrapper",
+        "//cc:registry",
+        "//cc/config:config_util",
+        "//cc/util:status",
+        "//proto:config_cc_proto",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+cc_library(
+    name = "mac_factory",
+    srcs = ["mac_factory.cc"],
+    hdrs = ["mac_factory.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":mac_wrapper",
+        "//cc:key_manager",
+        "//cc:keyset_handle",
+        "//cc:mac",
+        "//cc:primitive_set",
+        "//cc:registry",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "@com_google_absl//absl/base:core_headers",
+    ],
+)
+
+cc_library(
+    name = "mac_key_templates",
+    srcs = ["mac_key_templates.cc"],
+    hdrs = ["mac_key_templates.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//proto:aes_cmac_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:hmac_cc_proto",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "aes_cmac_key_manager",
+    hdrs = ["aes_cmac_key_manager.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:core/key_type_manager",
+        "//cc:key_manager",
+        "//cc:mac",
+        "//cc/subtle:aes_cmac_boringssl",
+        "//cc/subtle:random",
+        "//cc/util:constants",
+        "//cc/util:enums",
+        "//cc/util:errors",
+        "//cc/util:protobuf_helper",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:validation",
+        "//proto:aes_cmac_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "hmac_key_manager",
+    srcs = ["hmac_key_manager.cc"],
+    hdrs = ["hmac_key_manager.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:core/key_type_manager",
+        "//cc:mac",
+        "//cc/subtle:hmac_boringssl",
+        "//cc/subtle:random",
+        "//cc/util:constants",
+        "//cc/util:enums",
+        "//cc/util:errors",
+        "//cc/util:protobuf_helper",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:validation",
+        "//proto:common_cc_proto",
+        "//proto:hmac_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+# tests
+
+cc_test(
+    name = "mac_wrapper_test",
+    size = "small",
+    srcs = ["mac_wrapper_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":mac_wrapper",
+        "//cc:crypto_format",
+        "//cc:mac",
+        "//cc:primitive_set",
+        "//cc/util:status",
+        "//cc/util:test_matchers",
+        "//cc/util:test_util",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "mac_config_test",
+    size = "small",
+    srcs = ["mac_config_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":hmac_key_manager",
+        ":mac_config",
+        ":mac_key_templates",
+        "//cc:config",
+        "//cc:keyset_handle",
+        "//cc:mac",
+        "//cc:registry",
+        "//cc/util:status",
+        "//cc/util:test_matchers",
+        "//cc/util:test_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "mac_factory_test",
+    size = "small",
+    srcs = ["mac_factory_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":hmac_key_manager",
+        ":mac_config",
+        ":mac_factory",
+        "//cc:crypto_format",
+        "//cc:keyset_handle",
+        "//cc:mac",
+        "//cc/util:status",
+        "//cc/util:test_keyset_handle",
+        "//cc/util:test_util",
+        "//proto:common_cc_proto",
+        "//proto:hmac_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "mac_key_templates_test",
+    size = "small",
+    srcs = ["mac_key_templates_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_cmac_key_manager",
+        ":hmac_key_manager",
+        ":mac_key_templates",
+        "//cc:core/key_manager_impl",
+        "//cc/util:test_matchers",
+        "//proto:aes_cmac_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:hmac_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aes_cmac_key_manager_test",
+    size = "small",
+    srcs = ["aes_cmac_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_cmac_key_manager",
+        "//cc:mac",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:test_matchers",
+        "//proto:aes_cmac_cc_proto",
+        "//proto:aes_ctr_cc_proto",
+        "//proto:aes_ctr_hmac_aead_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "hmac_key_manager_test",
+    size = "small",
+    srcs = ["hmac_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":hmac_key_manager",
+        "//cc:core/key_manager_impl",
+        "//cc:mac",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:test_matchers",
+        "//proto:aes_ctr_hmac_aead_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:hmac_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

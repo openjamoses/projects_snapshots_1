@@ -1,0 +1,130 @@
+package(default_visibility = ["//tools/build_defs:internal_pkg"])
+
+licenses(["notice"])  # Apache 2.0
+
+cc_library(
+    name = "errors",
+    srcs = ["errors.cc"],
+    hdrs = ["errors.h"],
+    deps = [
+        ":status",
+    ],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+cc_library(
+    name = "enums",
+    srcs = ["enums.cc"],
+    hdrs = ["enums.h"],
+    deps = [
+        "//cc/subtle:common_enums",
+        "//proto:common_cc_proto",
+    ],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+cc_library(
+    name = "status",
+    srcs = ["status.cc"],
+    hdrs = ["status.h"],
+    visibility = ["//visibility:public"],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+cc_library(
+    name = "statusor",
+    srcs = ["statusor.h"],
+    hdrs = ["statusor.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":status",
+    ],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+cc_library(
+    name = "validation",
+    srcs = ["validation.cc"],
+    hdrs = ["validation.h"],
+    deps = [
+        ":errors",
+        ":status",
+        "//proto:tink_cc_proto",
+    ],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+cc_library(
+    name = "test_util",
+    srcs = ["test_util.cc"],
+    hdrs = ["test_util.h"],
+    deps = [
+        ":enums",
+        ":protobuf_helper",
+        ":status",
+        ":statusor",
+        "//cc:aead",
+        "//cc:binary_keyset_reader",
+        "//cc:cleartext_keyset_handle",
+        "//cc:hybrid_decrypt",
+        "//cc:hybrid_encrypt",
+        "//cc:keyset_handle",
+        "//cc:mac",
+        "//cc:public_key_sign",
+        "//cc:public_key_verify",
+        "//cc/aead:aes_gcm_key_manager",
+        "//cc/subtle:subtle_util_boringssl",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:ecdsa_cc_proto",
+        "//proto:ecies_aead_hkdf_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+cc_library(
+    name = "protobuf_helper",
+    hdrs = ["protobuf_helper.h"],
+    deps = [
+        "@com_google_protobuf//:protobuf_lite",
+    ],
+    strip_include_prefix = "/cc",
+    include_prefix = "tink",
+)
+
+# tests
+
+cc_test(
+    name = "enums_test",
+    size = "small",
+    srcs = ["enums_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    linkopts = ["-lpthread"],
+    deps = [
+        ":enums",
+        "//cc/subtle:common_enums",
+        "//proto:common_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "errors_test",
+    size = "small",
+    srcs = ["errors_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    linkopts = ["-lpthread"],
+    deps = [
+        ":errors",
+        ":status",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

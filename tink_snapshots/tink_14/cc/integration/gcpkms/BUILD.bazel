@@ -1,0 +1,69 @@
+package(default_visibility = ["//:__subpackages__"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "gcp_kms_aead",
+    srcs = ["gcp_kms_aead.cc"],
+    hdrs = ["gcp_kms_aead.h"],
+    include_prefix = "tink/integration/gcpkms",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@googleapis//google/cloud/kms/v1:kms_cc_grpc",
+        "//:aead",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
+cc_library(
+    name = "gcp_kms_client",
+    srcs = ["gcp_kms_client.cc"],
+    hdrs = ["gcp_kms_client.h"],
+    include_prefix = "tink/integration/gcpkms",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":gcp_kms_aead",
+        "//:kms_client",
+        "//:kms_clients",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@com_github_grpc_grpc//:grpc++",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/synchronization",
+    ],
+)
+
+# tests
+
+cc_test(
+    name = "gcp_kms_aead_test",
+    size = "medium",
+    srcs = ["gcp_kms_aead_test.cc"],
+    deps = [
+        ":gcp_kms_aead",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "gcp_kms_client_test",
+    size = "medium",
+    srcs = ["gcp_kms_client_test.cc"],
+    data = ["@tink_base//testdata:credentials"],
+    deps = [
+        ":gcp_kms_client",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "//util:test_matchers",
+        "//util:test_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

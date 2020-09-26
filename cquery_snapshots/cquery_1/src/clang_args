@@ -1,0 +1,39 @@
+# Language
+-xc++
+-std=c++11
+
+# Includes
+# Windows
+-IC:/Users/jacob/Desktop/superindex/indexer/third_party
+-IC:/Users/jacob/Desktop/superindex/indexer/third_party/doctest
+-IC:/Users/jacob/Desktop/superindex/indexer/third_party/rapidjson/include
+-IC:/Users/jacob/Desktop/superindex/indexer/third_party/sparsehash/src
+-IC:/Users/jacob/Desktop/superindex/indexer/third_party/sparsepp
+-IC:/Program Files/LLVM/include
+# OSX
+#-I/Users/jdufault/Personal/super-clang-index/third_party
+#-I/Users/jdufault/Personal/super-clang-index/third_party/doctest
+#-I/Users/jdufault/Personal/super-clang-index/third_party/rapidjson/include
+#-I/Users/jdufault/Personal/super-clang-index/third_party/sparsehash/src
+#-I/Users/jdufault/Personal/super-clang-index/build/clang+llvm-4.0.0-x86_64-apple-darwin/include
+
+# Use libcxx
+#-stdlib=libc++
+#-nostdinc++
+#-IC:/Users/jacob/Desktop/superindex/indexer/libcxx/include
+#-fms-compatibility
+#-fdelayed-template-parsing
+
+
+
+
+
+
+
+#--sysrootC:/Users/jacob/Desktop/superindex/indexer/libcxx
+#-IC:/Users/jacob/Desktop/superindex/indexer/libcxx/include
+#-FC:/Users/jacob/Desktop/superindex/indexer/libcxx/include
+
+#-L<libcxx-install-prefix>/lib \
+#-Wl,-rpath,<libcxx-install-prefix>/lib \
+#-I<libcxx-install-prefix>/include/c++/v1 \

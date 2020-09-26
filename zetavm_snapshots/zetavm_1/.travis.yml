@@ -1,0 +1,35 @@
+sudo: required
+
+dist: trusty 
+
+os:
+    - osx
+
+services:
+    - docker 
+
+language: bash
+
+matrix:
+  include:
+    - os: osx
+    # works on Precise and Trusty
+    - os: linux
+      env:
+         - CXX="g++"
+
+    # works on Precise and Trusty
+    - os: linux
+      env:
+         - CXX="clang++"
+
+install:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker build -t zetavm/testing . ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -td --name zetavm -e CXX=$CXX zetavm/testing ; fi
+
+script:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker exec zetavm ./configure ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker exec zetavm make ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker exec zetavm make test ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./configure && make && make test ; fi 
+

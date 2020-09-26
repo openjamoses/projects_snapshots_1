@@ -1,0 +1,183 @@
+package(default_visibility = ["//:__subpackages__"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "aes_siv_key_manager",
+    hdrs = ["aes_siv_key_manager.h"],
+    include_prefix = "tink/daead",
+    deps = [
+        "//:core/key_type_manager",
+        "//:deterministic_aead",
+        "//subtle:aes_siv_boringssl",
+        "//subtle:random",
+        "//util:constants",
+        "//util:errors",
+        "//util:protobuf_helper",
+        "//util:status",
+        "//util:statusor",
+        "//util:validation",
+        "//proto:aes_siv_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "deterministic_aead_wrapper",
+    srcs = ["deterministic_aead_wrapper.cc"],
+    hdrs = ["deterministic_aead_wrapper.h"],
+    include_prefix = "tink/daead",
+    deps = [
+        "//:crypto_format",
+        "//:deterministic_aead",
+        "//:primitive_set",
+        "//:primitive_wrapper",
+        "//subtle:subtle_util_boringssl",
+        "//util:status",
+        "//util:statusor",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "deterministic_aead_config",
+    srcs = ["deterministic_aead_config.cc"],
+    hdrs = ["deterministic_aead_config.h"],
+    include_prefix = "tink/daead",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":aes_siv_key_manager",
+        ":deterministic_aead_wrapper",
+        "//config:config_util",
+        "//mac:mac_config",
+        "//util:status",
+        "//proto:config_cc_proto",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+cc_library(
+    name = "deterministic_aead_factory",
+    srcs = ["deterministic_aead_factory.cc"],
+    hdrs = ["deterministic_aead_factory.h"],
+    include_prefix = "tink/daead",
+    deps = [
+        ":deterministic_aead_wrapper",
+        "//:deterministic_aead",
+        "//:key_manager",
+        "//:keyset_handle",
+        "//:registry",
+        "//util:status",
+        "//util:statusor",
+        "@com_google_absl//absl/base:core_headers",
+    ],
+)
+
+cc_library(
+    name = "deterministic_aead_key_templates",
+    srcs = ["deterministic_aead_key_templates.cc"],
+    hdrs = ["deterministic_aead_key_templates.h"],
+    include_prefix = "tink/daead",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//proto:aes_siv_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+# tests
+
+cc_test(
+    name = "aes_siv_key_manager_test",
+    size = "small",
+    srcs = ["aes_siv_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_siv_key_manager",
+        "//:aead",
+        "//util:status",
+        "//util:statusor",
+        "//util:test_matchers",
+        "//proto:aes_siv_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "deterministic_aead_wrapper_test",
+    size = "small",
+    srcs = ["deterministic_aead_wrapper_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":deterministic_aead_wrapper",
+        "//:deterministic_aead",
+        "//:primitive_set",
+        "//util:status",
+        "//util:test_matchers",
+        "//util:test_util",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/memory",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "deterministic_aead_config_test",
+    size = "small",
+    srcs = ["deterministic_aead_config_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_siv_key_manager",
+        ":deterministic_aead_config",
+        ":deterministic_aead_key_templates",
+        "//:config",
+        "//:deterministic_aead",
+        "//:keyset_handle",
+        "//:registry",
+        "//util:status",
+        "//util:test_matchers",
+        "//util:test_util",
+        "@com_google_absl//absl/memory",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "deterministic_aead_factory_test",
+    size = "small",
+    srcs = ["deterministic_aead_factory_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_siv_key_manager",
+        ":deterministic_aead_config",
+        ":deterministic_aead_factory",
+        "//:crypto_format",
+        "//:deterministic_aead",
+        "//:keyset_handle",
+        "//util:status",
+        "//util:test_keyset_handle",
+        "//util:test_util",
+        "//proto:aes_siv_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "deterministic_aead_key_templates_test",
+    size = "small",
+    srcs = ["deterministic_aead_key_templates_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_siv_key_manager",
+        ":deterministic_aead_key_templates",
+        "//:core/key_manager_impl",
+        "//proto:aes_siv_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

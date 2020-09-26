@@ -1,0 +1,69 @@
+package(default_visibility = ["//:__subpackages__"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "streaming_prf",
+    hdrs = ["streaming_prf.h"],
+    include_prefix = "tink/subtle/prf",
+    deps = ["//:input_stream"],
+)
+
+cc_library(
+    name = "hkdf_streaming_prf",
+    srcs = ["hkdf_streaming_prf.cc"],
+    hdrs = ["hkdf_streaming_prf.h"],
+    include_prefix = "tink/subtle/prf",
+    deps = [
+        ":streaming_prf",
+        "//:input_stream",
+        "//subtle",
+        "//subtle:subtle_util",
+        "//subtle:subtle_util_boringssl",
+        "@boringssl//:crypto",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "streaming_prf_wrapper",
+    srcs = ["streaming_prf_wrapper.cc"],
+    hdrs = ["streaming_prf_wrapper.h"],
+    include_prefix = "tink/subtle/prf",
+    deps = [
+        ":streaming_prf",
+        "//:primitive_set",
+        "//:primitive_wrapper",
+        "//util:statusor",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "hkdf_streaming_prf_test",
+    srcs = ["hkdf_streaming_prf_test.cc"],
+    deps = [
+        ":hkdf_streaming_prf",
+        "//subtle",
+        "//util:input_stream_util",
+        "//util:test_matchers",
+        "//util:test_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "streaming_prf_wrapper_test",
+    srcs = ["streaming_prf_wrapper_test.cc"],
+    deps = [
+        ":streaming_prf_wrapper",
+        "//proto:tink_cc_proto",
+        "//util:input_stream_util",
+        "//util:istream_input_stream",
+        "//util:test_matchers",
+        "//util:test_util",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_absl//absl/strings",
+    ],
+)

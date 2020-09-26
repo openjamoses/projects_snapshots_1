@@ -1,0 +1,126 @@
+{
+  "name": "cquery",
+  "description": "Low-latency language server for C++. Highly scalable and designed for huge code bases.",
+  "author": "Jacob Dufault",
+  "license": "MIT",
+  "version": "0.0.1",
+  "publisher": "jacobdufault",
+  "preview": true,
+  "engines": {
+    "vscode": "^1.8.0"
+  },
+  "categories": [
+    "Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:cpp",
+    "workspaceContains:compile_commands.json",
+    "workspaceContains:clang_args"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "commands": [
+      {
+        "title": "Freshen Index",
+        "category": "cquery",
+        "command": "cquery.freshenIndex"
+      },
+      {
+        "title": "Show Variables",
+        "category": "cquery",
+        "command": "cquery.vars"
+      },
+      {
+        "title": "Show Callers",
+        "category": "cquery",
+        "command": "cquery.callers"
+      },
+      {
+        "title": "Show Base",
+        "category": "cquery",
+        "command": "cquery.base"
+      },
+      {
+        "title": "Show Derived",
+        "category": "cquery",
+        "command": "cquery.derived"
+      }
+    ],
+
+    "configuration": {
+      "type": "object",
+      "title": "cquery",
+      "properties": {
+        "cquery.launch.workingDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the directory which contains the cquery binary (ie, if cquery is checkout out at /work/cquery/ then this directory is /work/cquery/build)"
+        },
+        "cquery.launch.command": {
+          "type": "string",
+          "default": "./app",
+          "description": "Command to start the cquery binary (on Linux ./app, on Windows indexer.exe)"
+        },
+        "cquery.cacheDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the directory that the cached index will be stored in. Try to have this directory on an SSD. If not explicitly set, this will be automatically populated with the extension cache directory.\n\nCache directories are project-wide, so this should be configured in the workspace settings so multiple indexes do not clash.\n\nExample value: \"/work/cquery-cache/chrome/\""
+        },
+        "cquery.whitelist": {
+          "type": "array",
+          "default": [],
+          "description": "Every EMCAScript regex in this list must match the translation unit's absolute path for it to get indexed. An empty list is interpreted as matching everything.\n\nYou probably want to begin the regex using `.*` because the passed paths are absolute."
+        },
+        "cquery.blacklist": {
+          "type": "array",
+          "default": [],
+          "description": "A translation unit (cc/cpp file) is not indexed if any of the EMCAScript regexes in this list matches translation unit's the absolute path.\n\nYou probably want to begin the regex using `.*` because the passed paths are absolute."
+        },
+        "cquery.extraClangArguments": {
+          "type": "array",
+          "default": [],
+          "description": "An extra set of command line arguments to give clang when indexing. Each list entry is a separate argument."
+        },
+        "cquery.misc.maxWorkspaceSearchResults": {
+          "type": "number",
+          "default": 1000,
+          "description": "The maximum number of global search (ie, Ctrl+P + #foo) search results to report. For small search strings on large projects there can be a massive number of results (ie, over 1,000,000) so this limit is important to avoid extremely long delays."
+        },
+        "cquery.misc.indexerCount": {
+          "type": "number",
+          "default": 0,
+          "description": "Forcibly set the number of indexing/working jobs. This value is automatically computed by the indexer and you should not need to set it manually.\n\nIdeally, this should be the number of CPU cores you have, minus one. cquery scales quite well so this number can go very high; cquery will use 5000%+ CPU usage on machines with over 50 cores. If you set the value higher than your number of hardware threads, cquery will slow down significantly due to thread contention.\n\nIf set to 0 or a negative value, the indexer will ignore this value.\n\nFor example, if you have a 4 core hyper-threaded processor, this should be set to 7. If you have dual 13 core hyper-threaded processors, this should be set to 2*13*2-1=51."
+        },
+        "cquery.misc.enableIndexing": {
+          "type": "boolean",
+          "default": true,
+          "description": "If set to false, updating the index will be disabled. You should not need to use this."
+        },
+        "cquery.misc.enableCacheWrite": {
+          "type": "boolean",
+          "default": true,
+          "description": "If set to false, writing indexed files out to cache will be disabled. Only useful if |enableIndexing| is true. You should not need to use this."
+        },
+        "cquery.misc.enableCacheRead": {
+          "type": "boolean",
+          "default": true,
+          "description": "If set to false, restoring the cached index will be disabled. Only useful if there is a cached index stored on disk. You should not need to use this."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "update-vscode": "node ./node_modules/vscode/bin/install",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.52",
+    "typescript": "^2.1.5",
+    "vscode": "^1.0.3"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^3.0.3"
+  }
+}

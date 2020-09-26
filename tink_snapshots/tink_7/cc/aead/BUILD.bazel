@@ -1,0 +1,358 @@
+package(default_visibility = ["//tools/build_defs:internal_pkg"])
+
+licenses(["notice"])  # Apache 2.0
+
+cc_library(
+    name = "aead_wrapper",
+    srcs = ["aead_wrapper.cc"],
+    hdrs = ["aead_wrapper.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:aead",
+        "//cc:crypto_format",
+        "//cc:primitive_set",
+        "//cc:primitive_wrapper",
+        "//cc:registry",
+        "//cc/subtle:subtle_util_boringssl",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "aead_catalogue",
+    srcs = ["aead_catalogue.cc"],
+    hdrs = ["aead_catalogue.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":aes_ctr_hmac_aead_key_manager",
+        ":aes_eax_key_manager",
+        ":aes_gcm_key_manager",
+        ":xchacha20_poly1305_key_manager",
+        "//cc:aead",
+        "//cc:catalogue",
+        "//cc:key_manager",
+        "//cc/util:status",
+    ],
+)
+
+cc_library(
+    name = "aead_config",
+    srcs = ["aead_config.cc"],
+    hdrs = ["aead_config.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":aead_catalogue",
+        ":aead_wrapper",
+        "//cc:config",
+        "//cc/mac:mac_config",
+        "//cc/util:status",
+        "//proto:config_cc_proto",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+cc_library(
+    name = "aead_factory",
+    srcs = ["aead_factory.cc"],
+    hdrs = ["aead_factory.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":aead_wrapper",
+        "//cc:aead",
+        "//cc:key_manager",
+        "//cc:keyset_handle",
+        "//cc:primitive_set",
+        "//cc:registry",
+        "//cc/util:status",
+        "//cc/util:statusor",
+    ],
+)
+
+cc_library(
+    name = "aead_key_templates",
+    srcs = ["aead_key_templates.cc"],
+    hdrs = ["aead_key_templates.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//proto:aes_ctr_hmac_aead_cc_proto",
+        "//proto:aes_eax_cc_proto",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "//proto:xchacha20_poly1305_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "aes_eax_key_manager",
+    srcs = ["aes_eax_key_manager.cc"],
+    hdrs = ["aes_eax_key_manager.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:aead",
+        "//cc:key_manager",
+        "//cc:key_manager_base",
+        "//cc/subtle:aes_eax_boringssl",
+        "//cc/subtle:random",
+        "//cc/util:errors",
+        "//cc/util:protobuf_helper",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:validation",
+        "//proto:aes_eax_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/base",
+    ],
+)
+
+cc_library(
+    name = "aes_gcm_key_manager",
+    srcs = ["aes_gcm_key_manager.cc"],
+    hdrs = ["aes_gcm_key_manager.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:aead",
+        "//cc:key_manager",
+        "//cc:key_manager_base",
+        "//cc/subtle:aes_gcm_boringssl",
+        "//cc/subtle:random",
+        "//cc/util:errors",
+        "//cc/util:protobuf_helper",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:validation",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/base",
+    ],
+)
+
+cc_library(
+    name = "aes_ctr_hmac_aead_key_manager",
+    srcs = ["aes_ctr_hmac_aead_key_manager.cc"],
+    hdrs = ["aes_ctr_hmac_aead_key_manager.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:aead",
+        "//cc:key_manager",
+        "//cc:key_manager_base",
+        "//cc:mac",
+        "//cc:registry",
+        "//cc/subtle:aes_ctr_boringssl",
+        "//cc/subtle:encrypt_then_authenticate",
+        "//cc/subtle:hmac_boringssl",
+        "//cc/subtle:random",
+        "//cc/util:enums",
+        "//cc/util:errors",
+        "//cc/util:protobuf_helper",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:validation",
+        "//proto:aes_ctr_hmac_aead_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/base",
+    ],
+)
+
+cc_library(
+    name = "xchacha20_poly1305_key_manager",
+    srcs = ["xchacha20_poly1305_key_manager.cc"],
+    hdrs = ["xchacha20_poly1305_key_manager.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:aead",
+        "//cc:key_manager",
+        "//cc:key_manager_base",
+        "//cc/subtle:random",
+        "//cc/subtle:xchacha20_poly1305_boringssl",
+        "//cc/util:errors",
+        "//cc/util:protobuf_helper",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//cc/util:validation",
+        "//proto:empty_cc_proto",
+        "//proto:tink_cc_proto",
+        "//proto:xchacha20_poly1305_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+# tests
+
+cc_test(
+    name = "aead_wrapper_test",
+    size = "small",
+    srcs = ["aead_wrapper_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aead_wrapper",
+        "//cc:aead",
+        "//cc:primitive_set",
+        "//cc/util:status",
+        "//cc/util:test_util",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aead_catalogue_test",
+    size = "small",
+    srcs = ["aead_catalogue_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aead_catalogue",
+        ":aead_config",
+        "//cc:aead",
+        "//cc:catalogue",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aead_config_test",
+    size = "small",
+    srcs = ["aead_config_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aead_config",
+        "//cc:aead",
+        "//cc:catalogue",
+        "//cc:config",
+        "//cc:registry",
+        "//cc/util:status",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aead_factory_test",
+    size = "small",
+    srcs = ["aead_factory_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aead_config",
+        ":aead_factory",
+        ":aes_gcm_key_manager",
+        "//cc:aead",
+        "//cc:crypto_format",
+        "//cc:keyset_handle",
+        "//cc/util:keyset_util",
+        "//cc/util:status",
+        "//cc/util:test_util",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aead_key_templates_test",
+    size = "small",
+    srcs = ["aead_key_templates_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aead_key_templates",
+        ":aes_ctr_hmac_aead_key_manager",
+        ":aes_eax_key_manager",
+        ":aes_gcm_key_manager",
+        ":xchacha20_poly1305_key_manager",
+        "//proto:aes_ctr_hmac_aead_cc_proto",
+        "//proto:aes_eax_cc_proto",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "//proto:xchacha20_poly1305_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aes_eax_key_manager_test",
+    size = "small",
+    srcs = ["aes_eax_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_eax_key_manager",
+        "//cc:aead",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//proto:aes_eax_cc_proto",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aes_gcm_key_manager_test",
+    size = "small",
+    srcs = ["aes_gcm_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_gcm_key_manager",
+        "//cc:aead",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//proto:aes_eax_cc_proto",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aes_ctr_hmac_aead_key_manager_test",
+    size = "small",
+    srcs = ["aes_ctr_hmac_aead_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aes_ctr_hmac_aead_key_manager",
+        "//cc:config",
+        "//cc/mac:mac_config",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//proto:aes_ctr_hmac_aead_cc_proto",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "xchacha20_poly1305_key_manager_test",
+    size = "small",
+    srcs = ["xchacha20_poly1305_key_manager_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":xchacha20_poly1305_key_manager",
+        "//cc:aead",
+        "//cc/util:status",
+        "//cc/util:statusor",
+        "//proto:aes_eax_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:tink_cc_proto",
+        "//proto:xchacha20_poly1305_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

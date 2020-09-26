@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+import sys
+
+print('cquery no longer supports building with waf. Please use cmake instead.')
+print('')
+print('Here is a quick getting-started:')
+print('')
+print('  # remove previous waf build directory')
+print('  $ rm -rf build')
+print('  ')
+print('  # setup new cmake build directory')
+print('  $ mkdir build')
+print('  $ cd build')
+print('  $ cmake .. -DCMAKE_BUILD_TYPE=release -DCMAKE_INSTALL_PREFIX=release -DCMAKE_EXPORT_COMPILE_COMMANDS=YES')
+print('  $ make install -j8')
+print('')
+print('See https://github.com/cquery-project/cquery/wiki/Building-cquery for more details')
+
+sys.exit(1)

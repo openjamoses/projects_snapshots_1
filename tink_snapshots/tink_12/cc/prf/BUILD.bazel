@@ -1,0 +1,77 @@
+package(
+    default_visibility = ["//:__subpackages__"],
+)
+
+licenses(["notice"])
+
+cc_library(
+    name = "hkdf_prf_key_manager",
+    hdrs = ["hkdf_prf_key_manager.h"],
+    include_prefix = "tink/prf",
+    deps = [
+        "//:core/key_type_manager",
+        "//subtle",
+        "//subtle/prf:hkdf_streaming_prf",
+        "//subtle/prf:streaming_prf",
+        "//util:constants",
+        "//util:enums",
+        "//util:status",
+        "//util:statusor",
+        "//util:validation",
+        "//proto:common_cc_proto",
+        "//proto:hkdf_prf_cc_proto",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "prf_config",
+    srcs = ["prf_config.cc"],
+    hdrs = ["prf_config.h"],
+    include_prefix = "tink/prf",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":hkdf_prf_key_manager",
+        "//:registry",
+        "//util:status",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "prf_key_templates",
+    srcs = ["prf_key_templates.cc"],
+    hdrs = ["prf_key_templates.h"],
+    include_prefix = "tink/prf",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":hkdf_prf_key_manager",
+        "//proto:hkdf_prf_cc_proto",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "hkdf_prf_key_manager_test",
+    srcs = ["hkdf_prf_key_manager_test.cc"],
+    deps = [
+        ":hkdf_prf_key_manager",
+        "//subtle",
+        "//subtle/prf:hkdf_streaming_prf",
+        "//util:input_stream_util",
+        "//util:test_matchers",
+        "//proto:common_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "prf_key_templates_test",
+    srcs = ["prf_key_templates_test.cc"],
+    deps = [
+        ":hkdf_prf_key_manager",
+        ":prf_key_templates",
+        "//util:test_matchers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

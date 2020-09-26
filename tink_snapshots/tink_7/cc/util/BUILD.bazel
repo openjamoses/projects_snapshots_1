@@ -1,0 +1,172 @@
+package(default_visibility = ["//tools/build_defs:internal_pkg"])
+
+licenses(["notice"])  # Apache 2.0
+
+cc_library(
+    name = "constants",
+    srcs = ["constants.cc"],
+    hdrs = ["constants.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "@com_google_absl//absl/base:core_headers",
+    ],
+)
+
+cc_library(
+    name = "errors",
+    srcs = ["errors.cc"],
+    hdrs = ["errors.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":status",
+    ],
+)
+
+cc_library(
+    name = "enums",
+    srcs = ["enums.cc"],
+    hdrs = ["enums.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc/subtle:common_enums",
+        "//proto:common_cc_proto",
+        "//proto:ecdsa_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "status",
+    srcs = ["status.cc"],
+    hdrs = ["status.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "statusor",
+    srcs = ["statusor.h"],
+    hdrs = ["statusor.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":status",
+    ],
+)
+
+cc_library(
+    name = "validation",
+    srcs = ["validation.cc"],
+    hdrs = ["validation.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":errors",
+        ":status",
+        "//proto:tink_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "test_util",
+    testonly = 1,
+    srcs = ["test_util.cc"],
+    hdrs = ["test_util.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":enums",
+        ":protobuf_helper",
+        ":status",
+        ":statusor",
+        "//cc:aead",
+        "//cc:cleartext_keyset_handle",
+        "//cc:deterministic_aead",
+        "//cc:hybrid_decrypt",
+        "//cc:hybrid_encrypt",
+        "//cc:keyset_handle",
+        "//cc:mac",
+        "//cc:public_key_sign",
+        "//cc:public_key_verify",
+        "//cc/aead:aes_gcm_key_manager",
+        "//cc/subtle:subtle_util_boringssl",
+        "//proto:aes_gcm_cc_proto",
+        "//proto:common_cc_proto",
+        "//proto:ecdsa_cc_proto",
+        "//proto:ecies_aead_hkdf_cc_proto",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "test_matchers",
+    testonly = 1,
+    srcs = [],
+    hdrs = ["test_matchers.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        ":status",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_library(
+    name = "keyset_util",
+    srcs = ["keyset_util.cc"],
+    hdrs = ["keyset_util.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "//cc:keyset_handle",
+        "//proto:tink_cc_proto",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+cc_library(
+    name = "protobuf_helper",
+    hdrs = ["protobuf_helper.h"],
+    include_prefix = "tink",
+    strip_include_prefix = "/cc",
+    deps = [
+        "@com_google_protobuf//:protobuf_lite",
+    ],
+)
+
+# tests
+
+cc_test(
+    name = "enums_test",
+    size = "small",
+    srcs = ["enums_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    linkopts = ["-lpthread"],
+    deps = [
+        ":enums",
+        "//cc/subtle:common_enums",
+        "//proto:common_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "errors_test",
+    size = "small",
+    srcs = ["errors_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    linkopts = ["-lpthread"],
+    deps = [
+        ":errors",
+        ":status",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

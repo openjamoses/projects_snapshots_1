@@ -1,0 +1,15 @@
+.vs
+Debug
+x64
+build
+libcxx
+CACHE*
+waf-*
+.lock-waf*
+.waf*
+*.swp
+*.sln
+.vscode/.ropeproject
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters

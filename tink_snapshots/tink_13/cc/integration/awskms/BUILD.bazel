@@ -1,0 +1,90 @@
+package(default_visibility = ["//:__subpackages__"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "aws_crypto",
+    srcs = [
+        "aws_crypto.cc",
+    ],
+    hdrs = [
+        "aws_crypto.h",
+    ],
+    include_prefix = "tink/integration/awskms",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@aws_cpp_sdk//:aws_sdk_core",
+        "@boringssl//:crypto",
+        "@com_google_absl//absl/base",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "aws_kms_aead",
+    srcs = ["aws_kms_aead.cc"],
+    hdrs = ["aws_kms_aead.h"],
+    include_prefix = "tink/integration/awskms",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:aead",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@aws_cpp_sdk//:aws_sdk_core",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "aws_kms_client",
+    srcs = ["aws_kms_client.cc"],
+    hdrs = ["aws_kms_client.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":aws_crypto",
+        ":aws_kms_aead",
+        "//:kms_client",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@aws_cpp_sdk//:aws_sdk_core",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/synchronization",
+    ],
+    alwayslink = 1,
+    include_prefix = "tink/integration/awskms",
+)
+
+# tests
+
+cc_test(
+    name = "aws_kms_aead_test",
+    size = "medium",
+    srcs = ["aws_kms_aead_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    deps = [
+        ":aws_kms_aead",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@aws_cpp_sdk//:aws_sdk_core",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "aws_kms_client_test",
+    size = "medium",
+    srcs = ["aws_kms_client_test.cc"],
+    copts = ["-Iexternal/gtest/include"],
+    data = ["@tink_base//testdata:credentials"],
+    deps = [
+        ":aws_kms_client",
+        "//util:errors",
+        "//util:status",
+        "//util:statusor",
+        "@aws_cpp_sdk//:aws_sdk_core",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

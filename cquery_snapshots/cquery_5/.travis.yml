@@ -1,0 +1,77 @@
+dist: trusty
+sudo: false
+# Use generic to avoid travis-ci overwriting CC and CXX
+# See: https://stackoverflow.com/questions/35110123/travis-ci-with-c14-and-linux
+language: generic 
+
+# Default git clone --recursive clones unnecessary dependencies so we override
+# it with our own command in before_install
+git:
+  submodules: false
+  depth: 1
+
+addons:
+  apt:
+    sources: &sources
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.6
+      - llvm-toolchain-trusty-6.0
+
+cache:
+  directories:
+    - clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-14.04/
+    - clang+llvm-6.0.0-x86_64-apple-darwin/
+
+# When building with Clang GCC still has to be installed to provide libstdc++
+# that Clang uses (Clang doesn't bundle libc++)
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      env: CXX=g++-5
+      addons:
+        apt:
+          sources: *sources
+          packages: 
+            - g++-5
+
+    - os: linux
+      env: CXX=g++-7
+      addons:
+        apt:
+          sources: *sources
+          packages: 
+            - g++-7
+
+    - os: linux
+      env: CXX=clang++-3.6
+      addons:
+        apt:
+          sources: *sources
+          packages: 
+            - clang-3.6
+            - g++-5
+
+    - os: linux
+      env: CXX=clang++-6.0
+      addons:
+        apt:
+          sources: *sources
+          packages:
+            - clang-6.0
+            - g++-5
+
+    - os: osx
+      osx_image: xcode9.2
+      env: CXX=clang++
+
+before_install:
+  - git submodule update --init
+  - eval "${INSTALL}"
+
+script:
+  - cmake -DCMAKE_INSTALL_PREFIX=install -DCMAKE_BUILD_TYPE=Debug .
+  - cmake --build . -- -j 3
+  - cmake --build . --target install
+  - ./install/bin/cquery --ci --log-all-to-stderr --test-unit
+  - ./install/bin/cquery --ci --log-all-to-stderr --test-index
